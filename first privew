@@ -1,0 +1,57 @@
+
+
+# Define the initial state 
+initial_state = (0, 0, 0, 0)  # (farmer, goat, cabbage, wolf) at the start (0) side of the river
+
+# Define the goal state
+goal_state = (1, 1, 1, 1)  # (farmer, goat, cabbage, wolf) at the end (1) side of the river
+
+# Define the valid moves
+valid_moves = [
+    (0, 1, 0, 0),  # move the farmer and the goat
+    (0, 0, 1, 0),  # move the farmer and the cabbage
+    (0, 0, 0, 1),  # move the farmer and the wolf
+    (0, -1, 0, 0), # move the farmer back with the goat
+    (0, 0, -1, 0), # move the farmer back with the cabbage
+    (0, 0, 0, -1)  # move the farmer back with the wolf
+]
+
+# Define a function to check if a state is valid
+def is_valid(state):
+    if state[1] == state[2] and state[0] != state[1]:  # Goat and cabbage cannot be left together without the farmer
+        return False
+    if state[1] == state[3] and state[0] != state[1]:  # Goat and wolf cannot be left together without the farmer
+        return False
+    return True
+
+# Define a function to perform bfs 
+def bfs():
+    visited = set()
+    queue = deque([(initial_state, [])])
+
+    while queue:
+        state, path = queue.popleft()
+        if state == goal_state:
+            return path
+
+        if state not in visited:
+            visited.add(state)
+            for move in valid_moves:
+                new_state = tuple(state[i] + move[i] for i in range(len(state)))
+                if all(0 <= item <= 1 for item in new_state) and is_valid(new_state):
+                    new_path = path + [(new_state, move)]
+                    queue.append((new_state, new_path))
+
+    return None  # No solution found
+
+# Solve the problem
+solution = bfs()
+
+# Print the solution
+if solution:
+    print("Solution found:")
+    for i, step in enumerate(solution):
+        state, move = step
+        print(f"Step {i+1}: Move {move} => {state}")
+else:
+    print("No solution found.")
